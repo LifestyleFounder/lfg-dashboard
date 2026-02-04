@@ -47,9 +47,25 @@ const state = {
     outliers: [],
 };
 
+// Data version - increment to force refresh
+const DATA_VERSION = 2;
+
 // Load state from localStorage
 function loadState() {
     const saved = localStorage.getItem('lfg-dashboard');
+    const savedVersion = localStorage.getItem('lfg-dashboard-version');
+    
+    // Force refresh if version changed
+    if (savedVersion !== String(DATA_VERSION)) {
+        console.log('New data version detected, refreshing...');
+        localStorage.removeItem('lfg-dashboard');
+        localStorage.setItem('lfg-dashboard-version', DATA_VERSION);
+        // Use defaults from state (already populated)
+        state.creators = getDefaultCreators();
+        saveState();
+        return;
+    }
+    
     if (saved) {
         const parsed = JSON.parse(saved);
         Object.assign(state, parsed);
@@ -81,7 +97,7 @@ function saveState() {
     localStorage.setItem('lfg-dashboard', JSON.stringify(state));
 }
 
-// Default creator watchlist
+// Default creator watchlist - with Instagram research data from Feb 4, 2026
 function getDefaultCreators() {
     return [
         {
@@ -90,39 +106,39 @@ function getDefaultCreators() {
             category: 'model',
             ytChannelId: 'UCo2Ld2eB0n7NqsSLPMRrYfw',
             igHandle: '@hormozi',
-            notes: 'Content king. Study his hooks, thumbnails, and retention strategies.',
+            notes: 'Content king. Avg 14,758 engagement. Top post: $100M Money Models (45K, 3.1x avg)',
         },
         {
             id: '2',
-            name: 'Frank Kern',
+            name: 'Greg Isenberg',
             category: 'model',
-            ytChannelId: 'UCyKZswR_GHRVL2qXdJtDvNg',
-            igHandle: '@frankkerinwtf',
-            notes: 'OG direct response marketer. Great storytelling and positioning.',
+            ytChannelId: '',
+            igHandle: '@gregisenberg',
+            notes: '🔥 OUTLIER: "Google" post hit 125K (11x avg!). Community + startup content.',
         },
         {
             id: '3',
+            name: 'Matt Gray',
+            category: 'model',
+            ytChannelId: '',
+            igHandle: '@matthgray',
+            notes: 'Founder brand. Systems + lifestyle. Avg 817 engagement.',
+        },
+        {
+            id: '4',
+            name: 'Cormac',
+            category: 'style-inspiration',
+            ytChannelId: '',
+            igHandle: '@buildwithcormac',
+            notes: '🔥 OUTLIER: "peak life" post hit 87K (7.8x avg). Build in public. 22K from 67 posts!',
+        },
+        {
+            id: '5',
             name: 'Stu McLaren',
             category: 'competitor',
             ytChannelId: 'UCl4i_MaUNvDvwYPpZIpz-Gg',
             igHandle: '@stumclaren',
-            notes: 'Membership/community expert. Direct competitor in the space.',
-        },
-        {
-            id: '4',
-            name: 'Russ Ruffino',
-            category: 'competitor',
-            ytChannelId: 'UCLdhH3yNjL6vJsRF7CWhPMA',
-            igHandle: '@russruffino',
-            notes: 'High-ticket coaching. Watch his positioning and offer structure.',
-        },
-        {
-            id: '5',
-            name: 'Anthony Bradley',
-            category: 'competitor',
-            ytChannelId: '',
-            igHandle: '@iamanthonybradley',
-            notes: 'Direct competitor. Similar audience and offer.',
+            notes: 'Membership expert. Avg 163 engagement. Re-intro post hit 3.7x.',
         },
         {
             id: '6',
@@ -130,7 +146,7 @@ function getDefaultCreators() {
             category: 'collab',
             ytChannelId: '',
             igHandle: '@mike_crowson',
-            notes: 'Potential collab opportunity.',
+            notes: '🔥 OUTLIER: Wedding post hit 5.3K (9.8x avg!). Personal milestones work.',
         },
         {
             id: '7',
@@ -138,10 +154,26 @@ function getDefaultCreators() {
             category: 'collab',
             ytChannelId: '',
             igHandle: '@mattleitzofficial',
-            notes: 'Potential collab opportunity.',
+            notes: 'Avg 305 engagement. Top post: "Stop Watching, Start Doing" (3.4x).',
         },
         {
             id: '8',
+            name: 'Russ Ruffino',
+            category: 'competitor',
+            ytChannelId: 'UCLdhH3yNjL6vJsRF7CWhPMA',
+            igHandle: '@russruffino',
+            notes: 'High-ticket coaching. Low IG engagement (9 avg).',
+        },
+        {
+            id: '9',
+            name: 'Anthony Bradley',
+            category: 'competitor',
+            ytChannelId: '',
+            igHandle: '@iamanthonybradley',
+            notes: 'Direct competitor. Low IG engagement (34 avg).',
+        },
+        {
+            id: '10',
             name: 'Chris Duncan',
             category: 'collab',
             ytChannelId: '',
