@@ -11,6 +11,7 @@ const state = {
     config: {
         ytApiKey: null,
         ytChannelId: 'UCsaposjX2IR0HY3YhrkUnMg', // @iamdanharrison
+        igHandle: 'thedanharrison',
     },
     youtube: {
         channel: null,
@@ -19,6 +20,30 @@ const state = {
     },
     instagram: {
         snapshots: [],
+        profile: {
+            handle: 'thedanharrison',
+            name: 'Dan Harrison • Business Coach',
+            followers: 20856,
+            following: 3257,
+            posts: 119,
+            bio: 'Installing AI into my business & documenting everything | 3x Skool Games 🏆'
+        },
+        analytics: {
+            lastUpdated: '2026-02-04',
+            avgLikes: 182,
+            avgComments: 24,
+            avgEngagement: 206,
+            reels: 0,
+            images: 11,
+            carousels: 9
+        },
+        topPosts: [
+            { caption: '#godisgood (wedding)', engagement: 1191, type: 'Carousel', multiple: 5.8 },
+            { caption: 'Coach/creator/expert CTA', engagement: 637, type: 'Image', multiple: 3.1 },
+            { caption: '10 year anniversary', engagement: 312, type: 'Image', multiple: 1.5 },
+            { caption: 'Quantum Leaps 2025', engagement: 292, type: 'Carousel', multiple: 1.4 },
+            { caption: 'Half a million in debt', engagement: 211, type: 'Image', multiple: 1.0 }
+        ]
     },
     creators: [],
     outliers: [],
