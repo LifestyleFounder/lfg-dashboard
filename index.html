@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFG Content Intelligence Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>Content Intelligence</h1>
+                <span class="subtitle">YouTube + Instagram Analytics & Research</span>
+            </div>
+            <div class="header-right">
+                <span class="last-updated" id="lastUpdated">Last updated: --</span>
+                <button class="btn btn-primary" onclick="refreshAll()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="youtube">Your YouTube</button>
+            <button class="tab" data-tab="instagram">Your Instagram</button>
+            <button class="tab" data-tab="creators">Creator Watch</button>
+            <button class="tab" data-tab="outliers">Outlier Detector</button>
+            <button class="tab" data-tab="trends">Trend Radar</button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="content">
+            <!-- Overview Tab -->
+            <section class="tab-content active" id="overview">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon yt">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">YouTube Subscribers</span>
+                            <span class="stat-value" id="ytSubs">--</span>
+                            <span class="stat-change positive" id="ytSubsChange">--</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yt">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">YT Views (30d)</span>
+                            <span class="stat-value" id="ytViews">--</span>
+                            <span class="stat-change" id="ytViewsChange">--</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ig">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Instagram Followers</span>
+                            <span class="stat-value" id="igFollowers">--</span>
+                            <span class="stat-change" id="igFollowersChange">--</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ig">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">IG Engagement Rate</span>
+                            <span class="stat-value" id="igEngagement">--</span>
+                            <span class="stat-change" id="igEngagementChange">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>🔥 Hot Outliers This Week</h2>
+                            <a href="#" class="see-all" onclick="switchTab('outliers')">See all →</a>
+                        </div>
+                        <div class="outlier-list" id="topOutliers">
+                            <div class="empty-state">
+                                <p>No outliers detected yet</p>
+                                <small>Add YouTube API key to start tracking</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>📈 Trending Topics</h2>
+                            <a href="#" class="see-all" onclick="switchTab('trends')">See all →</a>
+                        </div>
+                        <div class="trend-list" id="topTrends">
+                            <div class="empty-state">
+                                <p>Trend data loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>👀 Creator Watch Summary</h2>
+                        <a href="#" class="see-all" onclick="switchTab('creators')">See all →</a>
+                    </div>
+                    <div class="creator-summary" id="creatorSummary">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Your YouTube Tab -->
+            <section class="tab-content" id="youtube">
+                <div class="setup-card" id="ytSetup">
+                    <h2>🔑 Connect YouTube</h2>
+                    <p>Add your YouTube API key and Channel ID to start tracking your analytics.</p>
+                    <div class="form-group">
+                        <label>YouTube API Key</label>
+                        <input type="password" id="ytApiKey" placeholder="AIzaSy...">
+                        <small>Get one from <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Channel ID</label>
+                        <input type="text" id="ytChannelId" placeholder="UC..." value="UCsaposjX2IR0HY3YhrkUnMg">
+                        <small>@iamdanharrison ✓</small>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveYouTubeConfig()">Save & Connect</button>
+                </div>
+
+                <div class="yt-dashboard hidden" id="ytDashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card large">
+                            <span class="stat-label">Total Subscribers</span>
+                            <span class="stat-value" id="ytTotalSubs">--</span>
+                        </div>
+                        <div class="stat-card large">
+                            <span class="stat-label">Total Views</span>
+                            <span class="stat-value" id="ytTotalViews">--</span>
+                        </div>
+                        <div class="stat-card large">
+                            <span class="stat-label">Total Videos</span>
+                            <span class="stat-value" id="ytTotalVideos">--</span>
+                        </div>
+                        <div class="stat-card large">
+                            <span class="stat-label">Avg Views/Video</span>
+                            <span class="stat-value" id="ytAvgViews">--</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Recent Videos Performance</h2>
+                        </div>
+                        <div class="video-table" id="ytVideoList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Your Top Performing Videos</h2>
+                        </div>
+                        <div class="video-table" id="ytTopVideos">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Your Instagram Tab -->
+            <section class="tab-content" id="instagram">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📊 Instagram Metrics</h2>
+                        <button class="btn btn-secondary" onclick="openIgMetricsModal()">+ Add Data</button>
+                    </div>
+                    <p class="card-description">Instagram API requires business account + Facebook Page connection. For now, manually track key metrics weekly.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">Followers</span>
+                            <span class="stat-value" id="igManualFollowers">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Following</span>
+                            <span class="stat-value" id="igManualFollowing">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Posts</span>
+                            <span class="stat-value" id="igManualPosts">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Avg Likes</span>
+                            <span class="stat-value" id="igManualLikes">--</span>
+                        </div>
+                    </div>
+
+                    <div class="ig-history" id="igHistory">
+                        <h3>Weekly Snapshots</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Followers</th>
+                                    <th>Following</th>
+                                    <th>Posts</th>
+                                    <th>Avg Likes</th>
+                                    <th>Engagement %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="igHistoryBody">
+                                <tr><td colspan="6" class="empty">No data yet — add your first snapshot</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Creator Watch Tab -->
+            <section class="tab-content" id="creators">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>👀 Creator Watchlist</h2>
+                        <button class="btn btn-secondary" onclick="openAddCreatorModal()">+ Add Creator</button>
+                    </div>
+                    <p class="card-description">Track competitor and inspiration accounts. See what content they're posting and what's performing.</p>
+                    
+                    <div class="creator-grid" id="creatorGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Outlier Detector Tab -->
+            <section class="tab-content" id="outliers">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🎯 Outlier Detection</h2>
+                        <div class="filter-group">
+                            <select id="outlierTimeframe">
+                                <option value="7">Last 7 days</option>
+                                <option value="30" selected>Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                            </select>
+                            <select id="outlierThreshold">
+                                <option value="2">2x+ average</option>
+                                <option value="3" selected>3x+ average</option>
+                                <option value="5">5x+ average</option>
+                                <option value="10">10x+ average</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="card-description">Videos that significantly outperformed the creator's average. These are proven concepts worth studying and adapting.</p>
+                    
+                    <div class="outlier-grid" id="outlierGrid">
+                        <div class="empty-state">
+                            <h3>No outliers detected</h3>
+                            <p>Add creators to your watchlist and connect YouTube API to start detecting outliers.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trend Radar Tab -->
+            <section class="tab-content" id="trends">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📡 Trend Radar</h2>
+                        <button class="btn btn-secondary" onclick="refreshTrends()">Refresh</button>
+                    </div>
+                    <p class="card-description">Trending topics in the coaching, Skool, and online business space.</p>
+                    
+                    <div class="trend-categories">
+                        <div class="trend-category">
+                            <h3>🔥 Hot Right Now</h3>
+                            <div class="trend-tags" id="hotTrends">
+                                <span class="trend-tag">Skool communities</span>
+                                <span class="trend-tag">AI coaching</span>
+                                <span class="trend-tag">High-ticket offers</span>
+                                <span class="trend-tag">No-call sales</span>
+                                <span class="trend-tag">Community-led growth</span>
+                            </div>
+                        </div>
+                        <div class="trend-category">
+                            <h3>📈 Rising Topics</h3>
+                            <div class="trend-tags" id="risingTrends">
+                                <span class="trend-tag rising">Micro-communities</span>
+                                <span class="trend-tag rising">Async coaching</span>
+                                <span class="trend-tag rising">AI content creation</span>
+                                <span class="trend-tag rising">Lifestyle business</span>
+                            </div>
+                        </div>
+                        <div class="trend-category">
+                            <h3>💡 Content Ideas</h3>
+                            <div class="idea-list" id="contentIdeas">
+                                <div class="idea-card">
+                                    <span class="idea-type">Contrarian</span>
+                                    <p>"Why sales calls are killing your coaching business"</p>
+                                </div>
+                                <div class="idea-card">
+                                    <span class="idea-type">How-to</span>
+                                    <p>"The exact Skool setup that generates $50K/mo"</p>
+                                </div>
+                                <div class="idea-card">
+                                    <span class="idea-type">Story</span>
+                                    <p>"I replaced my sales team with a Skool community"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="igMetricsModal">
+            <div class="modal-header">
+                <h2>Add Instagram Snapshot</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="igDate" value="">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Followers</label>
+                        <input type="number" id="igInputFollowers" placeholder="20800">
+                    </div>
+                    <div class="form-group">
+                        <label>Following</label>
+                        <input type="number" id="igInputFollowing" placeholder="500">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Posts</label>
+                        <input type="number" id="igInputPosts" placeholder="711">
+                    </div>
+                    <div class="form-group">
+                        <label>Avg Likes (last 10 posts)</label>
+                        <input type="number" id="igInputLikes" placeholder="150">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveIgSnapshot()">Save Snapshot</button>
+            </div>
+        </div>
+
+        <div class="modal" id="addCreatorModal">
+            <div class="modal-header">
+                <h2>Add Creator to Watchlist</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Creator Name</label>
+                    <input type="text" id="creatorName" placeholder="Alex Hormozi">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="creatorCategory">
+                        <option value="model">Model (Study)</option>
+                        <option value="competitor">Competitor</option>
+                        <option value="collab">Collab Opportunity</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>YouTube Channel ID</label>
+                    <input type="text" id="creatorYtChannel" placeholder="UC...">
+                    <small>Optional - enables automatic tracking</small>
+                </div>
+                <div class="form-group">
+                    <label>Instagram Handle</label>
+                    <input type="text" id="creatorIgHandle" placeholder="@hormozi">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="creatorNotes" placeholder="Why are you tracking them?"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveCreator()">Add Creator</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
