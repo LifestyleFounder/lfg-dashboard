@@ -44,11 +44,84 @@ const state = {
         ]
     },
     creators: [],
-    outliers: [],
+    outliers: [
+        {
+            id: '1',
+            creatorHandle: '@gregisenberg',
+            creatorName: 'Greg Isenberg',
+            postUrl: 'https://www.instagram.com/gregisenberg/',
+            engagement: 125772,
+            avgEngagement: 11340,
+            multiple: 11.1,
+            caption: 'our kids will think we were crazy for using Google for 20 years...',
+            type: 'Hot Take on AI/Tech Future',
+            detectedAt: '2026-02-04',
+            platform: 'instagram'
+        },
+        {
+            id: '2',
+            creatorHandle: '@buildwithcormac',
+            creatorName: 'Cormac',
+            postUrl: 'https://www.instagram.com/buildwithcormac/',
+            engagement: 86658,
+            avgEngagement: 11070,
+            multiple: 7.8,
+            caption: 'peak life for a man in his 20s...',
+            type: 'Aspirational Lifestyle',
+            detectedAt: '2026-02-04',
+            platform: 'instagram'
+        },
+        {
+            id: '3',
+            creatorHandle: '@hormozi',
+            creatorName: 'Alex Hormozi',
+            postUrl: 'https://www.instagram.com/p/DLm63qQpxvw/',
+            engagement: 45326,
+            avgEngagement: 14758,
+            multiple: 3.1,
+            caption: '$100M Money Models book announcement',
+            type: 'Big Announcement/Launch',
+            detectedAt: '2026-02-04',
+            platform: 'instagram'
+        },
+        {
+            id: '4',
+            creatorHandle: '@mike_crowson',
+            creatorName: 'Mike Crowson',
+            postUrl: 'https://www.instagram.com/mike_crowson/',
+            engagement: 5286,
+            avgEngagement: 539,
+            multiple: 9.8,
+            caption: 'Mr. and Mrs. Crowson 💍 (wedding)',
+            type: 'Personal Milestone',
+            detectedAt: '2026-02-04',
+            platform: 'instagram'
+        },
+        {
+            id: '5',
+            creatorHandle: '@thedanharrison',
+            creatorName: 'Dan Harrison (You)',
+            postUrl: 'https://www.instagram.com/p/DIfL4yRz3Tk/',
+            engagement: 1191,
+            avgEngagement: 206,
+            multiple: 5.8,
+            caption: '#godisgood (wedding/milestone)',
+            type: 'Personal Milestone',
+            detectedAt: '2026-02-04',
+            platform: 'instagram'
+        }
+    ],
+    trends: [
+        { topic: 'AI replacing traditional tools', examples: 'Google, manual research, content creation', heat: 'hot' },
+        { topic: 'Build in public / Day X of journey', examples: '@buildwithcormac day 3,681 format', heat: 'hot' },
+        { topic: 'Personal milestones (weddings, anniversaries)', examples: 'Always 3-10x engagement', heat: 'consistent' },
+        { topic: 'Big announcements as events', examples: 'Book launches, program opens', heat: 'consistent' },
+        { topic: '"Our kids will think we were crazy"', examples: 'Future-looking hot takes', heat: 'hot' }
+    ]
 };
 
 // Data version - increment to force refresh
-const DATA_VERSION = 2;
+const DATA_VERSION = 3;
 
 // Load state from localStorage
 function loadState() {
@@ -393,19 +466,29 @@ function renderTopOutliers() {
     }
     
     const top5 = state.outliers.slice(0, 5);
-    container.innerHTML = top5.map(o => `
-        <div class="outlier-card">
-            <div class="outlier-header">
-                <span class="outlier-creator">${o.creatorName}</span>
-                <span class="outlier-multiplier">${o.multiplier}x</span>
+    container.innerHTML = top5.map(o => {
+        // Handle both YouTube and Instagram formats
+        const isInstagram = o.platform === 'instagram';
+        const title = isInstagram ? (o.caption || 'Instagram post') : (o.snippet?.title || 'Unknown');
+        const metric = isInstagram ? o.engagement : (o.statistics?.viewCount || 0);
+        const metricLabel = isInstagram ? 'engagement' : 'views';
+        const avgMetric = isInstagram ? o.avgEngagement : o.avgViews;
+        const platformIcon = isInstagram ? '📸' : '🎬';
+        
+        return `
+            <div class="outlier-card">
+                <div class="outlier-header">
+                    <span class="outlier-creator">${platformIcon} ${o.creatorName || o.creatorHandle}</span>
+                    <span class="outlier-multiplier">${o.multiple || o.multiplier}x</span>
+                </div>
+                <div class="outlier-title">${title.substring(0, 60)}...</div>
+                <div class="outlier-meta">
+                    <span>${formatNumber(metric)} ${metricLabel}</span>
+                    <span>Avg: ${formatNumber(avgMetric)}</span>
+                </div>
             </div>
-            <div class="outlier-title">${o.snippet?.title || 'Unknown'}</div>
-            <div class="outlier-meta">
-                <span>${formatNumber(o.statistics?.viewCount)} views</span>
-                <span>Avg: ${formatNumber(o.avgViews)}</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderYouTubeDashboard() {
@@ -553,20 +636,34 @@ function renderOutliers() {
         return;
     }
     
-    container.innerHTML = state.outliers.map(o => `
-        <div class="outlier-card">
-            <div class="outlier-header">
-                <span class="outlier-creator">${o.creatorName}</span>
-                <span class="outlier-multiplier">${o.multiplier}x avg</span>
+    container.innerHTML = state.outliers.map(o => {
+        // Handle both YouTube (snippet/statistics) and Instagram (caption/engagement) formats
+        const isInstagram = o.platform === 'instagram';
+        const title = isInstagram ? (o.caption || 'Instagram post') : (o.snippet?.title || 'Unknown');
+        const metric = isInstagram ? o.engagement : (o.statistics?.viewCount || 0);
+        const metricLabel = isInstagram ? 'engagement' : 'views';
+        const avgMetric = isInstagram ? o.avgEngagement : o.avgViews;
+        const url = isInstagram ? o.postUrl : `https://youtube.com/watch?v=${o.id}`;
+        const platformIcon = isInstagram ? '📸' : '🎬';
+        const date = o.detectedAt || (o.snippet?.publishedAt ? formatDate(o.snippet.publishedAt) : '--');
+        const type = o.type || 'Content';
+        
+        return `
+            <div class="outlier-card">
+                <div class="outlier-header">
+                    <span class="outlier-creator">${platformIcon} ${o.creatorName || o.creatorHandle}</span>
+                    <span class="outlier-multiplier">${o.multiple || o.multiplier}x avg</span>
+                </div>
+                <a href="${url}" target="_blank" class="outlier-title">${title}</a>
+                <div class="outlier-type">${type}</div>
+                <div class="outlier-meta">
+                    <span>📊 ${formatNumber(metric)} ${metricLabel}</span>
+                    <span>👤 Avg: ${formatNumber(avgMetric)}</span>
+                    <span>📅 ${date}</span>
+                </div>
             </div>
-            <a href="https://youtube.com/watch?v=${o.id}" target="_blank" class="outlier-title">${o.snippet?.title || 'Unknown'}</a>
-            <div class="outlier-meta">
-                <span>📊 ${formatNumber(o.statistics?.viewCount)} views</span>
-                <span>👤 Avg: ${formatNumber(o.avgViews)}</span>
-                <span>📅 ${formatDate(o.snippet?.publishedAt)}</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // ============================================
@@ -770,6 +867,36 @@ function renderAll() {
     renderInstagram();
     renderCreators();
     renderOutliers();
+    renderTrends();
+}
+
+function renderTrends() {
+    // Render hot trends from state
+    const hotContainer = document.getElementById('hotTrends');
+    const topTrendsContainer = document.getElementById('topTrends');
+    
+    if (state.trends && state.trends.length > 0) {
+        const hotTrends = state.trends.filter(t => t.heat === 'hot');
+        
+        if (hotContainer) {
+            hotContainer.innerHTML = state.trends.map(t => `
+                <span class="trend-tag ${t.heat === 'hot' ? 'hot' : ''}">${t.topic}</span>
+            `).join('');
+        }
+        
+        if (topTrendsContainer) {
+            topTrendsContainer.innerHTML = `
+                <div class="trend-list-items">
+                    ${state.trends.slice(0, 4).map(t => `
+                        <div class="trend-item">
+                            <span class="trend-heat ${t.heat}">${t.heat === 'hot' ? '🔥' : '📈'}</span>
+                            <span class="trend-topic">${t.topic}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    }
 }
 
 // ============================================
