@@ -785,3 +785,445 @@ body {
         aspect-ratio: 16/9;
     }
 }
+
+/* ============================================
+   PREMIUM ADDITIONS - Feb 4, 2026
+   ============================================ */
+
+/* Trends Grid */
+.trends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.trend-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    border-left: 4px solid var(--sage);
+}
+
+.trend-card.hot {
+    border-left-color: var(--warning);
+    background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
+}
+
+.trend-header {
+    margin-bottom: 12px;
+}
+
+.trend-heat-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--stone);
+}
+
+.trend-card.hot .trend-heat-badge {
+    background: var(--warning);
+    color: white;
+}
+
+.trend-topic {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: 12px;
+}
+
+.trend-examples, .trend-action {
+    font-size: 14px;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+}
+
+.trend-action {
+    padding: 10px;
+    background: var(--warm-white);
+    border-radius: var(--radius-sm);
+    margin-top: 12px;
+}
+
+/* Ideas Grid */
+.ideas-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.idea-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+}
+
+.idea-number {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--forest-green);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.idea-content {
+    flex: 1;
+}
+
+.idea-hook {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: 4px;
+}
+
+.idea-angle {
+    font-size: 14px;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+}
+
+.idea-based-on {
+    font-size: 12px;
+    color: var(--sage);
+}
+
+.idea-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.idea-status.ready {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+/* Outlier Enhancements */
+.outlier-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+}
+
+.outlier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.outlier-creator {
+    font-weight: 600;
+    color: var(--forest-green);
+}
+
+.outlier-multiple {
+    background: var(--gold);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.outlier-caption {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--charcoal);
+    text-decoration: none;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.outlier-caption:hover {
+    color: var(--forest-green);
+}
+
+.outlier-type {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--warm-white);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.outlier-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--sage);
+    margin-bottom: 12px;
+}
+
+.outlier-insight {
+    padding: 12px;
+    background: linear-gradient(135deg, #F0FDF4 0%, white 100%);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--charcoal);
+    border-left: 3px solid var(--success);
+}
+
+/* Overview Mini Cards */
+.outlier-mini {
+    padding: 12px;
+    background: white;
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+}
+
+.outlier-mini-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.outlier-mini-creator {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.outlier-mini-multiple {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.outlier-mini-caption {
+    font-size: 13px;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+}
+
+.outlier-mini-type {
+    font-size: 11px;
+    color: var(--sage);
+}
+
+.trend-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: white;
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+    border: 1px solid var(--border);
+}
+
+.trend-heat-icon {
+    font-size: 16px;
+}
+
+.trend-mini .trend-topic {
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Creator Card Enhancements */
+.creator-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+}
+
+.creator-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.creator-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--forest-green);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.creator-info {
+    flex: 1;
+}
+
+.creator-name {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.creator-handle {
+    font-size: 13px;
+    color: var(--sage);
+    text-decoration: none;
+}
+
+.creator-handle:hover {
+    color: var(--instagram-pink);
+}
+
+.creator-category {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--warm-white);
+    border-radius: 20px;
+}
+
+.creator-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.creator-stat {
+    padding: 10px;
+    background: var(--warm-white);
+    border-radius: var(--radius-sm);
+}
+
+.creator-stat .stat-label {
+    display: block;
+    font-size: 11px;
+    color: var(--sage);
+    margin-bottom: 2px;
+}
+
+.creator-stat .stat-value {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.creator-notes {
+    font-size: 13px;
+    color: var(--charcoal);
+    padding: 10px;
+    background: #FFFBEB;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--gold);
+}
+
+.creator-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: white;
+    border-radius: 30px;
+    margin: 4px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+}
+
+.creator-pill-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--forest-green);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.creator-pill .fire {
+    margin-left: 4px;
+}
+
+/* Toast Notifications */
+.toast {
+    padding: 12px 20px;
+    background: var(--forest-green);
+    color: white;
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+#toasts {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+}
+
+/* Instagram Top Posts */
+#igTopPosts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.top-post-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.top-post-engagement {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--forest-green);
+}
+
+.top-post-multiple {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.top-post-caption {
+    font-size: 13px;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+}
+
+.top-post-type {
+    font-size: 11px;
+    color: var(--sage);
+}

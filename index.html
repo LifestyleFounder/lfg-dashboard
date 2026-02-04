@@ -233,6 +233,13 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <div class="ig-top-posts">
+                        <h3>📈 Your Top Performing Posts</h3>
+                        <div id="igTopPosts">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -286,47 +293,24 @@
                 <div class="card">
                     <div class="card-header">
                         <h2>📡 Trend Radar</h2>
-                        <button class="btn btn-secondary" onclick="refreshTrends()">Refresh</button>
+                        <small>Updated from today's Instagram research</small>
                     </div>
-                    <p class="card-description">Trending topics in the coaching, Skool, and online business space.</p>
+                    <p class="card-description">Trending patterns from your creator watchlist. Use these for content ideas.</p>
                     
-                    <div class="trend-categories">
-                        <div class="trend-category">
-                            <h3>🔥 Hot Right Now</h3>
-                            <div class="trend-tags" id="hotTrends">
-                                <span class="trend-tag">Skool communities</span>
-                                <span class="trend-tag">AI coaching</span>
-                                <span class="trend-tag">High-ticket offers</span>
-                                <span class="trend-tag">No-call sales</span>
-                                <span class="trend-tag">Community-led growth</span>
-                            </div>
-                        </div>
-                        <div class="trend-category">
-                            <h3>📈 Rising Topics</h3>
-                            <div class="trend-tags" id="risingTrends">
-                                <span class="trend-tag rising">Micro-communities</span>
-                                <span class="trend-tag rising">Async coaching</span>
-                                <span class="trend-tag rising">AI content creation</span>
-                                <span class="trend-tag rising">Lifestyle business</span>
-                            </div>
-                        </div>
-                        <div class="trend-category">
-                            <h3>💡 Content Ideas</h3>
-                            <div class="idea-list" id="contentIdeas">
-                                <div class="idea-card">
-                                    <span class="idea-type">Contrarian</span>
-                                    <p>"Why sales calls are killing your coaching business"</p>
-                                </div>
-                                <div class="idea-card">
-                                    <span class="idea-type">How-to</span>
-                                    <p>"The exact Skool setup that generates $50K/mo"</p>
-                                </div>
-                                <div class="idea-card">
-                                    <span class="idea-type">Story</span>
-                                    <p>"I replaced my sales team with a Skool community"</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="trendsList" class="trends-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>💡 Ready-to-Film Content Ideas</h2>
+                        <small>Based on outlier analysis</small>
+                    </div>
+                    <p class="card-description">Hooks and angles proven to work. Adapt these to your voice.</p>
+                    
+                    <div id="contentIdeasList" class="ideas-grid">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </section>
@@ -412,5 +396,7 @@
     </div>
 
     <script src="app.js"></script>
+    <!-- Toast Notifications -->
+    <div id="toasts"></div>
 </body>
 </html>

@@ -1,24 +1,40 @@
 /**
  * LFG Content Intelligence Dashboard
+ * Premium Version - Feb 4, 2026
  * YouTube + Instagram Analytics & Research
  */
 
 // ============================================
-// State Management
+// PRE-POPULATED DATA (No API needed for core features)
 // ============================================
 
-const state = {
+const INITIAL_STATE = {
+    version: 4,
     config: {
         ytApiKey: null,
-        ytChannelId: 'UCsaposjX2IR0HY3YhrkUnMg', // @iamdanharrison
+        ytChannelId: 'UCsaposjX2IR0HY3YhrkUnMg',
         igHandle: 'thedanharrison',
     },
     youtube: {
-        channel: null,
+        channel: {
+            statistics: {
+                subscriberCount: '625',
+                viewCount: '36000',
+                videoCount: '45'
+            }
+        },
         videos: [],
-        lastFetch: null,
+        lastFetch: '2026-02-04',
     },
     instagram: {
+        profile: {
+            handle: 'thedanharrison',
+            name: 'Dan Harrison • Business Coach',
+            bio: 'Installing AI into my business & documenting everything | 3x Skool Games 🏆',
+            followers: 20856,
+            following: 3257,
+            posts: 119
+        },
         snapshots: [
             {
                 date: '2026-02-04',
@@ -30,413 +46,362 @@ const state = {
                 notes: 'Initial scrape via Apify. 0 Reels, 11 Images, 9 Carousels.'
             }
         ],
-        profile: {
-            handle: 'thedanharrison',
-            name: 'Dan Harrison • Business Coach',
-            bio: 'Installing AI into my business & documenting everything | 3x Skool Games 🏆'
-        },
         topPosts: [
             { caption: '#godisgood (wedding)', engagement: 1191, type: 'Carousel', multiple: 5.8 },
             { caption: 'Coach/creator/expert CTA', engagement: 637, type: 'Image', multiple: 3.1 },
-            { caption: '10 year anniversary', engagement: 312, type: 'Image', multiple: 1.5 },
-            { caption: 'Quantum Leaps 2025', engagement: 292, type: 'Carousel', multiple: 1.4 },
-            { caption: 'Half a million in debt', engagement: 211, type: 'Image', multiple: 1.0 }
+            { caption: '10 year anniversary', engagement: 312, type: 'Image', multiple: 1.5 }
         ]
     },
-    creators: [],
-    outliers: [
-        {
-            id: '1',
-            creatorHandle: '@gregisenberg',
-            creatorName: 'Greg Isenberg',
-            postUrl: 'https://www.instagram.com/gregisenberg/',
-            engagement: 125772,
-            avgEngagement: 11340,
-            multiple: 11.1,
-            caption: 'our kids will think we were crazy for using Google for 20 years...',
-            type: 'Hot Take on AI/Tech Future',
-            detectedAt: '2026-02-04',
-            platform: 'instagram'
-        },
-        {
-            id: '2',
-            creatorHandle: '@buildwithcormac',
-            creatorName: 'Cormac',
-            postUrl: 'https://www.instagram.com/buildwithcormac/',
-            engagement: 86658,
-            avgEngagement: 11070,
-            multiple: 7.8,
-            caption: 'peak life for a man in his 20s...',
-            type: 'Aspirational Lifestyle',
-            detectedAt: '2026-02-04',
-            platform: 'instagram'
-        },
-        {
-            id: '3',
-            creatorHandle: '@hormozi',
-            creatorName: 'Alex Hormozi',
-            postUrl: 'https://www.instagram.com/p/DLm63qQpxvw/',
-            engagement: 45326,
-            avgEngagement: 14758,
-            multiple: 3.1,
-            caption: '$100M Money Models book announcement',
-            type: 'Big Announcement/Launch',
-            detectedAt: '2026-02-04',
-            platform: 'instagram'
-        },
-        {
-            id: '4',
-            creatorHandle: '@mike_crowson',
-            creatorName: 'Mike Crowson',
-            postUrl: 'https://www.instagram.com/mike_crowson/',
-            engagement: 5286,
-            avgEngagement: 539,
-            multiple: 9.8,
-            caption: 'Mr. and Mrs. Crowson 💍 (wedding)',
-            type: 'Personal Milestone',
-            detectedAt: '2026-02-04',
-            platform: 'instagram'
-        },
-        {
-            id: '5',
-            creatorHandle: '@thedanharrison',
-            creatorName: 'Dan Harrison (You)',
-            postUrl: 'https://www.instagram.com/p/DIfL4yRz3Tk/',
-            engagement: 1191,
-            avgEngagement: 206,
-            multiple: 5.8,
-            caption: '#godisgood (wedding/milestone)',
-            type: 'Personal Milestone',
-            detectedAt: '2026-02-04',
-            platform: 'instagram'
-        }
-    ],
-    trends: [
-        { topic: 'AI replacing traditional tools', examples: 'Google, manual research, content creation', heat: 'hot' },
-        { topic: 'Build in public / Day X of journey', examples: '@buildwithcormac day 3,681 format', heat: 'hot' },
-        { topic: 'Personal milestones (weddings, anniversaries)', examples: 'Always 3-10x engagement', heat: 'consistent' },
-        { topic: 'Big announcements as events', examples: 'Book launches, program opens', heat: 'consistent' },
-        { topic: '"Our kids will think we were crazy"', examples: 'Future-looking hot takes', heat: 'hot' }
-    ]
-};
-
-// Data version - increment to force refresh
-const DATA_VERSION = 3;
-
-// Load state from localStorage
-function loadState() {
-    const saved = localStorage.getItem('lfg-dashboard');
-    const savedVersion = localStorage.getItem('lfg-dashboard-version');
-    
-    // Force refresh if version changed
-    if (savedVersion !== String(DATA_VERSION)) {
-        console.log('New data version detected, refreshing...');
-        localStorage.removeItem('lfg-dashboard');
-        localStorage.setItem('lfg-dashboard-version', DATA_VERSION);
-        // Use defaults from state (already populated)
-        state.creators = getDefaultCreators();
-        saveState();
-        return;
-    }
-    
-    if (saved) {
-        const parsed = JSON.parse(saved);
-        Object.assign(state, parsed);
-    }
-    
-    // Initialize with default creators if empty
-    if (state.creators.length === 0) {
-        state.creators = getDefaultCreators();
-        saveState();
-    }
-    
-    // Initialize Instagram data if empty
-    if (!state.instagram.snapshots || state.instagram.snapshots.length === 0) {
-        state.instagram.snapshots = [{
-            date: '2026-02-04',
-            followers: 20856,
-            following: 3257,
-            posts: 119,
-            avgLikes: 182,
-            avgComments: 24,
-            notes: 'Initial scrape via Apify'
-        }];
-        saveState();
-    }
-}
-
-// Save state to localStorage
-function saveState() {
-    localStorage.setItem('lfg-dashboard', JSON.stringify(state));
-}
-
-// Default creator watchlist - with Instagram research data from Feb 4, 2026
-function getDefaultCreators() {
-    return [
+    creators: [
         {
             id: '1',
             name: 'Alex Hormozi',
             category: 'model',
-            ytChannelId: 'UCo2Ld2eB0n7NqsSLPMRrYfw',
             igHandle: '@hormozi',
-            notes: 'Content king. Avg 14,758 engagement. Top post: $100M Money Models (45K, 3.1x avg)',
+            avgEngagement: 14758,
+            topPost: '45,326 (3.1x) - $100M Money Models launch',
+            notes: 'Content king. Big announcements work.'
         },
         {
             id: '2',
             name: 'Greg Isenberg',
             category: 'model',
-            ytChannelId: '',
             igHandle: '@gregisenberg',
-            notes: '🔥 OUTLIER: "Google" post hit 125K (11x avg!). Community + startup content.',
+            avgEngagement: 11340,
+            topPost: '125,772 (11.1x) - "Google" hot take 🔥',
+            notes: 'MASSIVE outlier. Study this hook format.'
         },
         {
             id: '3',
             name: 'Matt Gray',
             category: 'model',
-            ytChannelId: '',
             igHandle: '@matthgray',
-            notes: 'Founder brand. Systems + lifestyle. Avg 817 engagement.',
+            avgEngagement: 817,
+            topPost: '2,079 (2.5x) - Freedom post',
+            notes: 'Founder brand. Systems + lifestyle.'
         },
         {
             id: '4',
             name: 'Cormac',
             category: 'style-inspiration',
-            ytChannelId: '',
             igHandle: '@buildwithcormac',
-            notes: '🔥 OUTLIER: "peak life" post hit 87K (7.8x avg). Build in public. 22K from 67 posts!',
+            avgEngagement: 11070,
+            topPost: '86,658 (7.8x) - "Peak life" 🔥',
+            notes: 'Build in public. 22K from 67 posts. Study his format.'
         },
         {
             id: '5',
             name: 'Stu McLaren',
             category: 'competitor',
-            ytChannelId: 'UCl4i_MaUNvDvwYPpZIpz-Gg',
             igHandle: '@stumclaren',
-            notes: 'Membership expert. Avg 163 engagement. Re-intro post hit 3.7x.',
+            avgEngagement: 163,
+            topPost: '602 (3.7x) - Re-intro post',
+            notes: 'Membership expert. Re-intro posts work.'
         },
         {
             id: '6',
             name: 'Mike Crowson',
             category: 'collab',
-            ytChannelId: '',
             igHandle: '@mike_crowson',
-            notes: '🔥 OUTLIER: Wedding post hit 5.3K (9.8x avg!). Personal milestones work.',
+            avgEngagement: 539,
+            topPost: '5,286 (9.8x) - Wedding 🔥',
+            notes: 'Personal milestones crush it.'
         },
         {
             id: '7',
             name: 'Matt Leitz',
             category: 'collab',
-            ytChannelId: '',
             igHandle: '@mattleitzofficial',
-            notes: 'Avg 305 engagement. Top post: "Stop Watching, Start Doing" (3.4x).',
+            avgEngagement: 305,
+            topPost: '1,049 (3.4x) - Stop Watching',
+            notes: 'Action-oriented hooks work.'
         },
         {
             id: '8',
             name: 'Russ Ruffino',
             category: 'competitor',
-            ytChannelId: 'UCLdhH3yNjL6vJsRF7CWhPMA',
             igHandle: '@russruffino',
-            notes: 'High-ticket coaching. Low IG engagement (9 avg).',
+            avgEngagement: 9,
+            topPost: '87 (9.7x)',
+            notes: 'Low IG engagement. Not a focus.'
+        }
+    ],
+    outliers: [
+        {
+            id: '1',
+            platform: 'instagram',
+            creatorName: 'Greg Isenberg',
+            creatorHandle: '@gregisenberg',
+            postUrl: 'https://www.instagram.com/gregisenberg/',
+            caption: 'our kids will think we were crazy for using Google for 20 years...',
+            engagement: 125772,
+            avgEngagement: 11340,
+            multiple: 11.1,
+            type: '🔥 Hot Take / AI Future',
+            detectedAt: '2026-02-04',
+            insight: 'Contrarian future-looking hook. Makes people feel smart for agreeing.'
         },
         {
-            id: '9',
-            name: 'Anthony Bradley',
-            category: 'competitor',
-            ytChannelId: '',
-            igHandle: '@iamanthonybradley',
-            notes: 'Direct competitor. Low IG engagement (34 avg).',
+            id: '2',
+            platform: 'instagram',
+            creatorName: 'Cormac',
+            creatorHandle: '@buildwithcormac',
+            postUrl: 'https://www.instagram.com/buildwithcormac/',
+            caption: 'peak life for a man in his 20s...',
+            engagement: 86658,
+            avgEngagement: 11070,
+            multiple: 7.8,
+            type: '✨ Aspirational Lifestyle',
+            detectedAt: '2026-02-04',
+            insight: 'Pure aspiration. Shows the life, not tactics.'
         },
         {
-            id: '10',
-            name: 'Chris Duncan',
-            category: 'collab',
-            ytChannelId: '',
-            igHandle: '@chrismduncan',
-            notes: 'Potential collab opportunity.',
+            id: '3',
+            platform: 'instagram',
+            creatorName: 'Alex Hormozi',
+            creatorHandle: '@hormozi',
+            postUrl: 'https://www.instagram.com/p/DLm63qQpxvw/',
+            caption: '$100M Money Models - Book Announcement',
+            engagement: 45326,
+            avgEngagement: 14758,
+            multiple: 3.1,
+            type: '📢 Big Announcement',
+            detectedAt: '2026-02-04',
+            insight: 'Create events, not just posts. Announcements spike.'
         },
-    ];
-}
-
-// ============================================
-// Tab Navigation
-// ============================================
-
-function initTabs() {
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabId = tab.dataset.tab;
-            switchTab(tabId);
-        });
-    });
-}
-
-function switchTab(tabId) {
-    // Update tab buttons
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
-    
-    // Update tab content
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-}
-
-// ============================================
-// YouTube API
-// ============================================
-
-async function fetchYouTubeChannel(channelId) {
-    if (!state.config.ytApiKey) return null;
-    
-    const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${channelId}&key=${state.config.ytApiKey}`;
-    
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        
-        if (data.items && data.items.length > 0) {
-            return data.items[0];
+        {
+            id: '4',
+            platform: 'instagram',
+            creatorName: 'Mike Crowson',
+            creatorHandle: '@mike_crowson',
+            postUrl: 'https://www.instagram.com/mike_crowson/',
+            caption: 'Mr. and Mrs. Crowson 💍',
+            engagement: 5286,
+            avgEngagement: 539,
+            multiple: 9.8,
+            type: '💒 Personal Milestone',
+            detectedAt: '2026-02-04',
+            insight: 'Weddings, anniversaries, big life moments = 5-10x engagement.'
+        },
+        {
+            id: '5',
+            platform: 'instagram',
+            creatorName: 'Dan Harrison (You)',
+            creatorHandle: '@thedanharrison',
+            postUrl: 'https://www.instagram.com/p/DIfL4yRz3Tk/',
+            caption: '#godisgood - Wedding/Milestone',
+            engagement: 1191,
+            avgEngagement: 206,
+            multiple: 5.8,
+            type: '💒 Personal Milestone',
+            detectedAt: '2026-02-04',
+            insight: 'YOUR top post is also a personal milestone. Pattern confirmed.'
         }
-    } catch (err) {
-        console.error('Error fetching YouTube channel:', err);
-    }
-    return null;
-}
-
-async function fetchYouTubeVideos(channelId, maxResults = 20) {
-    if (!state.config.ytApiKey) return [];
-    
-    // First get uploads playlist ID
-    const channel = await fetchYouTubeChannel(channelId);
-    if (!channel) return [];
-    
-    const uploadsPlaylistId = channel.contentDetails?.relatedPlaylists?.uploads;
-    if (!uploadsPlaylistId) {
-        // Fallback: search for videos
-        return fetchYouTubeVideosBySearch(channelId, maxResults);
-    }
-    
-    // Get videos from playlist
-    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${state.config.ytApiKey}`;
-    
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        
-        if (data.items) {
-            const videoIds = data.items.map(item => item.contentDetails.videoId).join(',');
-            return fetchYouTubeVideoStats(videoIds);
+    ],
+    trends: [
+        {
+            topic: '"Our kids will think we were crazy for..."',
+            heat: 'hot',
+            examples: 'Using Google, manual research, no AI',
+            action: 'Film a hot take using this hook format'
+        },
+        {
+            topic: 'AI replacing traditional workflows',
+            heat: 'hot',
+            examples: 'Search, content creation, research',
+            action: 'Document your AI installation journey'
+        },
+        {
+            topic: 'Build in public / Day X',
+            heat: 'hot',
+            examples: '@buildwithcormac "day 3,681 of building"',
+            action: 'Start a "installing AI" documentation series'
+        },
+        {
+            topic: 'Personal milestones',
+            heat: 'consistent',
+            examples: 'Weddings, anniversaries, big moments',
+            action: 'Don\'t skip life moments - they perform 5-10x'
+        },
+        {
+            topic: 'Big announcements as events',
+            heat: 'consistent',
+            examples: 'Launches, reveals, major updates',
+            action: 'Frame the 30-Day Challenge launch as an event'
         }
-    } catch (err) {
-        console.error('Error fetching YouTube videos:', err);
-    }
-    return [];
-}
-
-async function fetchYouTubeVideosBySearch(channelId, maxResults = 20) {
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=${maxResults}&order=date&type=video&key=${state.config.ytApiKey}`;
-    
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        
-        if (data.items) {
-            const videoIds = data.items.map(item => item.id.videoId).join(',');
-            return fetchYouTubeVideoStats(videoIds);
+    ],
+    contentIdeas: [
+        {
+            hook: 'Our kids will think we were crazy',
+            angle: 'for manually scrolling Instagram to find what content works',
+            status: 'ready',
+            basedOn: 'Greg Isenberg outlier (11x)'
+        },
+        {
+            hook: 'I built this while you were sleeping',
+            angle: 'Content intelligence system that scrapes competitors',
+            status: 'ready',
+            basedOn: 'AI documentation series'
+        },
+        {
+            hook: 'I stopped doing sales calls',
+            angle: 'Built a community that sells for me instead',
+            status: 'ready',
+            basedOn: 'Core positioning'
+        },
+        {
+            hook: 'AI didn\'t take my job',
+            angle: 'It gave me my life back - now AI does 80% of the work',
+            status: 'ready',
+            basedOn: 'AI documentation series'
+        },
+        {
+            hook: 'The coaches who survive AI',
+            angle: 'Sell belonging, not information',
+            status: 'ready',
+            basedOn: 'Strategic conversation Feb 4'
         }
-    } catch (err) {
-        console.error('Error searching YouTube videos:', err);
-    }
-    return [];
-}
-
-async function fetchYouTubeVideoStats(videoIds) {
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${state.config.ytApiKey}`;
-    
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        return data.items || [];
-    } catch (err) {
-        console.error('Error fetching video stats:', err);
-    }
-    return [];
-}
+    ],
+    lastUpdated: '2026-02-04T21:30:00Z'
+};
 
 // ============================================
-// Outlier Detection
+// STATE MANAGEMENT
 // ============================================
 
-function calculateOutliers(videos, threshold = 3) {
-    if (videos.length < 5) return [];
-    
-    // Calculate average views
-    const views = videos.map(v => parseInt(v.statistics?.viewCount || 0));
-    const avgViews = views.reduce((a, b) => a + b, 0) / views.length;
-    
-    // Find outliers (videos with views > threshold * average)
-    const outliers = videos.filter(v => {
-        const viewCount = parseInt(v.statistics?.viewCount || 0);
-        return viewCount > avgViews * threshold;
-    }).map(v => ({
-        ...v,
-        multiplier: (parseInt(v.statistics?.viewCount || 0) / avgViews).toFixed(1),
-        avgViews: Math.round(avgViews),
-    }));
-    
-    return outliers.sort((a, b) => parseFloat(b.multiplier) - parseFloat(a.multiplier));
-}
+let state = JSON.parse(JSON.stringify(INITIAL_STATE));
 
-async function detectAllOutliers() {
-    const threshold = parseInt(document.getElementById('outlierThreshold')?.value || 3);
-    const outliers = [];
-    
-    for (const creator of state.creators) {
-        if (creator.ytChannelId && state.config.ytApiKey) {
-            const videos = await fetchYouTubeVideos(creator.ytChannelId, 50);
-            const creatorOutliers = calculateOutliers(videos, threshold);
-            
-            creatorOutliers.forEach(o => {
-                outliers.push({
-                    ...o,
-                    creatorName: creator.name,
-                    creatorCategory: creator.category,
-                });
-            });
+function loadState() {
+    const saved = localStorage.getItem('lfg-dashboard-v4');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            // Merge saved data with initial state (keeps new fields)
+            state = { ...INITIAL_STATE, ...parsed };
+        } catch (e) {
+            console.log('Error loading state, using defaults');
+            state = JSON.parse(JSON.stringify(INITIAL_STATE));
         }
     }
-    
-    state.outliers = outliers.sort((a, b) => parseFloat(b.multiplier) - parseFloat(a.multiplier));
-    saveState();
+    updateLastUpdated();
+}
+
+function saveState() {
+    localStorage.setItem('lfg-dashboard-v4', JSON.stringify(state));
+    updateLastUpdated();
+}
+
+function resetToDefaults() {
+    if (confirm('Reset all data to defaults? This will clear any custom settings.')) {
+        localStorage.removeItem('lfg-dashboard-v4');
+        state = JSON.parse(JSON.stringify(INITIAL_STATE));
+        renderAll();
+        showToast('Reset to defaults');
+    }
+}
+
+function updateLastUpdated() {
+    const el = document.getElementById('lastUpdated');
+    if (el) {
+        const now = new Date();
+        el.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+    }
+}
+
+// ============================================
+// UTILITY FUNCTIONS  
+// ============================================
+
+function formatNumber(num) {
+    if (!num) return '--';
+    const n = parseInt(num);
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return n.toLocaleString();
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '--';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function getInitials(name) {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        'model': '#4CAF50',
+        'competitor': '#FF9800', 
+        'collab': '#2196F3',
+        'style-inspiration': '#9C27B0'
+    };
+    return colors[category] || '#666';
+}
+
+function getCategoryLabel(category) {
+    const labels = {
+        'model': '📚 Model',
+        'competitor': '🎯 Competitor',
+        'collab': '🤝 Collab',
+        'style-inspiration': '✨ Style Inspo'
+    };
+    return labels[category] || category;
+}
+
+function showToast(message) {
+    const container = document.getElementById('toasts');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+
+function renderAll() {
+    renderOverview();
+    renderYouTube();
+    renderInstagram();
+    renderCreators();
     renderOutliers();
+    renderTrends();
+    renderContentIdeas();
 }
-
-// ============================================
-// UI Rendering
-// ============================================
 
 function renderOverview() {
     // YouTube stats
-    if (state.youtube.channel) {
+    if (state.youtube?.channel?.statistics) {
         const stats = state.youtube.channel.statistics;
-        document.getElementById('ytSubs').textContent = formatNumber(stats.subscriberCount);
-        document.getElementById('ytViews').textContent = formatNumber(stats.viewCount);
+        const ytSubs = document.getElementById('ytSubs');
+        const ytViews = document.getElementById('ytViews');
+        if (ytSubs) ytSubs.textContent = formatNumber(stats.subscriberCount);
+        if (ytViews) ytViews.textContent = formatNumber(stats.viewCount);
     }
     
-    // Instagram stats (from latest snapshot)
-    if (state.instagram.snapshots.length > 0) {
-        const latest = state.instagram.snapshots[state.instagram.snapshots.length - 1];
-        document.getElementById('igFollowers').textContent = formatNumber(latest.followers);
-        if (latest.followers && latest.avgLikes) {
-            const engagement = ((latest.avgLikes / latest.followers) * 100).toFixed(2);
-            document.getElementById('igEngagement').textContent = engagement + '%';
+    // Instagram stats
+    if (state.instagram?.profile) {
+        const profile = state.instagram.profile;
+        const igFollowers = document.getElementById('igFollowers');
+        if (igFollowers) igFollowers.textContent = formatNumber(profile.followers);
+        
+        // Engagement rate
+        const latest = state.instagram.snapshots?.[state.instagram.snapshots.length - 1];
+        if (latest && latest.followers && latest.avgLikes) {
+            const rate = ((latest.avgLikes / latest.followers) * 100).toFixed(2);
+            const igEngagement = document.getElementById('igEngagement');
+            if (igEngagement) igEngagement.textContent = rate + '%';
         }
     }
     
-    // Creator summary
     renderCreatorSummary();
-    
-    // Top outliers
     renderTopOutliers();
+    renderTopTrends();
 }
 
 function renderCreatorSummary() {
@@ -444,9 +409,10 @@ function renderCreatorSummary() {
     if (!container) return;
     
     container.innerHTML = state.creators.map(c => `
-        <div class="creator-pill">
+        <div class="creator-pill" style="border-left: 3px solid ${getCategoryColor(c.category)}">
             <div class="creator-pill-avatar">${getInitials(c.name)}</div>
             <span>${c.name}</span>
+            ${c.topPost?.includes('🔥') ? '<span class="fire">🔥</span>' : ''}
         </div>
     `).join('');
 }
@@ -455,124 +421,89 @@ function renderTopOutliers() {
     const container = document.getElementById('topOutliers');
     if (!container) return;
     
-    if (state.outliers.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <p>No outliers detected yet</p>
-                <small>Add YouTube API key to start tracking</small>
-            </div>
-        `;
+    if (!state.outliers || state.outliers.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No outliers yet</p></div>';
         return;
     }
     
-    const top5 = state.outliers.slice(0, 5);
-    container.innerHTML = top5.map(o => {
-        // Handle both YouTube and Instagram formats
-        const isInstagram = o.platform === 'instagram';
-        const title = isInstagram ? (o.caption || 'Instagram post') : (o.snippet?.title || 'Unknown');
-        const metric = isInstagram ? o.engagement : (o.statistics?.viewCount || 0);
-        const metricLabel = isInstagram ? 'engagement' : 'views';
-        const avgMetric = isInstagram ? o.avgEngagement : o.avgViews;
-        const platformIcon = isInstagram ? '📸' : '🎬';
-        
-        return `
-            <div class="outlier-card">
-                <div class="outlier-header">
-                    <span class="outlier-creator">${platformIcon} ${o.creatorName || o.creatorHandle}</span>
-                    <span class="outlier-multiplier">${o.multiple || o.multiplier}x</span>
-                </div>
-                <div class="outlier-title">${title.substring(0, 60)}...</div>
-                <div class="outlier-meta">
-                    <span>${formatNumber(metric)} ${metricLabel}</span>
-                    <span>Avg: ${formatNumber(avgMetric)}</span>
-                </div>
+    container.innerHTML = state.outliers.slice(0, 4).map(o => `
+        <div class="outlier-mini">
+            <div class="outlier-mini-header">
+                <span class="outlier-mini-creator">${o.creatorName}</span>
+                <span class="outlier-mini-multiple">${o.multiple}x</span>
             </div>
-        `;
-    }).join('');
-}
-
-function renderYouTubeDashboard() {
-    const setup = document.getElementById('ytSetup');
-    const dashboard = document.getElementById('ytDashboard');
-    
-    if (state.config.ytApiKey && state.config.ytChannelId) {
-        setup.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-        
-        if (state.youtube.channel) {
-            const stats = state.youtube.channel.statistics;
-            document.getElementById('ytTotalSubs').textContent = formatNumber(stats.subscriberCount);
-            document.getElementById('ytTotalViews').textContent = formatNumber(stats.viewCount);
-            document.getElementById('ytTotalVideos').textContent = formatNumber(stats.videoCount);
-            
-            const avgViews = Math.round(parseInt(stats.viewCount) / parseInt(stats.videoCount));
-            document.getElementById('ytAvgViews').textContent = formatNumber(avgViews);
-        }
-        
-        renderYouTubeVideos();
-    } else {
-        setup.classList.remove('hidden');
-        dashboard.classList.add('hidden');
-        
-        // Pre-fill if saved
-        if (state.config.ytApiKey) {
-            document.getElementById('ytApiKey').value = state.config.ytApiKey;
-        }
-        if (state.config.ytChannelId) {
-            document.getElementById('ytChannelId').value = state.config.ytChannelId;
-        }
-    }
-}
-
-function renderYouTubeVideos() {
-    const container = document.getElementById('ytVideoList');
-    if (!container || state.youtube.videos.length === 0) {
-        if (container) {
-            container.innerHTML = '<div class="empty-state"><p>No videos loaded yet</p></div>';
-        }
-        return;
-    }
-    
-    const videos = state.youtube.videos.slice(0, 10);
-    container.innerHTML = videos.map(v => `
-        <div class="video-row">
-            <img class="video-thumb" src="${v.snippet?.thumbnails?.medium?.url || ''}" alt="">
-            <div class="video-title">${v.snippet?.title || 'Unknown'}</div>
-            <div class="video-stat">
-                <div class="video-stat-value">${formatNumber(v.statistics?.viewCount)}</div>
-                <div class="video-stat-label">Views</div>
-            </div>
-            <div class="video-stat">
-                <div class="video-stat-value">${formatNumber(v.statistics?.likeCount)}</div>
-                <div class="video-stat-label">Likes</div>
-            </div>
-            <div class="video-stat">
-                <div class="video-stat-value">${formatNumber(v.statistics?.commentCount)}</div>
-                <div class="video-stat-label">Comments</div>
-            </div>
+            <div class="outlier-mini-caption">${o.caption.substring(0, 50)}...</div>
+            <div class="outlier-mini-type">${o.type}</div>
         </div>
     `).join('');
 }
 
+function renderTopTrends() {
+    const container = document.getElementById('topTrends');
+    if (!container) return;
+    
+    if (!state.trends || state.trends.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No trends yet</p></div>';
+        return;
+    }
+    
+    container.innerHTML = state.trends.slice(0, 4).map(t => `
+        <div class="trend-mini">
+            <span class="trend-heat-icon">${t.heat === 'hot' ? '🔥' : '📈'}</span>
+            <span class="trend-topic">${t.topic}</span>
+        </div>
+    `).join('');
+}
+
+function renderYouTube() {
+    const setup = document.getElementById('ytSetup');
+    const dashboard = document.getElementById('ytDashboard');
+    
+    if (!setup || !dashboard) return;
+    
+    // Always show dashboard with pre-populated data
+    setup.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    
+    if (state.youtube?.channel?.statistics) {
+        const stats = state.youtube.channel.statistics;
+        const el = (id) => document.getElementById(id);
+        if (el('ytTotalSubs')) el('ytTotalSubs').textContent = formatNumber(stats.subscriberCount);
+        if (el('ytTotalViews')) el('ytTotalViews').textContent = formatNumber(stats.viewCount);
+        if (el('ytTotalVideos')) el('ytTotalVideos').textContent = formatNumber(stats.videoCount);
+        
+        const avgViews = Math.round(parseInt(stats.viewCount) / parseInt(stats.videoCount));
+        if (el('ytAvgViews')) el('ytAvgViews').textContent = formatNumber(avgViews);
+    }
+    
+    // Show API key input for live updates
+    const apiSection = document.getElementById('ytApiSection');
+    if (apiSection && state.config.ytApiKey) {
+        document.getElementById('ytApiKey').value = '••••••••' + state.config.ytApiKey.slice(-4);
+    }
+}
+
 function renderInstagram() {
-    const latest = state.instagram.snapshots[state.instagram.snapshots.length - 1];
+    const latest = state.instagram?.snapshots?.[state.instagram.snapshots.length - 1];
     
     if (latest) {
-        document.getElementById('igManualFollowers').textContent = formatNumber(latest.followers);
-        document.getElementById('igManualFollowing').textContent = formatNumber(latest.following);
-        document.getElementById('igManualPosts').textContent = formatNumber(latest.posts);
-        document.getElementById('igManualLikes').textContent = formatNumber(latest.avgLikes);
+        const el = (id) => document.getElementById(id);
+        if (el('igManualFollowers')) el('igManualFollowers').textContent = formatNumber(latest.followers);
+        if (el('igManualFollowing')) el('igManualFollowing').textContent = formatNumber(latest.following);
+        if (el('igManualPosts')) el('igManualPosts').textContent = formatNumber(latest.posts);
+        if (el('igManualLikes')) el('igManualLikes').textContent = formatNumber(latest.avgLikes);
     }
     
     renderInstagramHistory();
+    renderInstagramTopPosts();
 }
 
 function renderInstagramHistory() {
     const tbody = document.getElementById('igHistoryBody');
     if (!tbody) return;
     
-    if (state.instagram.snapshots.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty">No data yet — add your first snapshot</td></tr>';
+    if (!state.instagram?.snapshots || state.instagram.snapshots.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">No data yet</td></tr>';
         return;
     }
     
@@ -591,33 +522,50 @@ function renderInstagramHistory() {
     }).join('');
 }
 
+function renderInstagramTopPosts() {
+    const container = document.getElementById('igTopPosts');
+    if (!container || !state.instagram?.topPosts) return;
+    
+    container.innerHTML = state.instagram.topPosts.map(p => `
+        <div class="top-post-card">
+            <div class="top-post-engagement">${formatNumber(p.engagement)}</div>
+            <div class="top-post-multiple">${p.multiple}x avg</div>
+            <div class="top-post-caption">${p.caption}</div>
+            <div class="top-post-type">${p.type}</div>
+        </div>
+    `).join('');
+}
+
 function renderCreators() {
     const container = document.getElementById('creatorGrid');
     if (!container) return;
     
-    if (state.creators.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <p>No creators in your watchlist</p>
-                <button class="btn btn-primary" onclick="openAddCreatorModal()">Add Creator</button>
-            </div>
-        `;
+    if (!state.creators || state.creators.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No creators tracked</p></div>';
         return;
     }
     
     container.innerHTML = state.creators.map(c => `
-        <div class="creator-card">
-            <div class="creator-avatar">${getInitials(c.name)}</div>
-            <div class="creator-info">
-                <h3>${c.name}</h3>
-                <span class="category ${c.category}">${formatCategory(c.category)}</span>
-                <div class="creator-handles">
-                    ${c.igHandle ? `<a href="https://instagram.com/${c.igHandle.replace('@', '')}" target="_blank">${c.igHandle}</a>` : ''}
-                    ${c.igHandle && c.ytChannelId ? ' · ' : ''}
-                    ${c.ytChannelId ? `<a href="https://youtube.com/channel/${c.ytChannelId}" target="_blank">YouTube</a>` : ''}
+        <div class="creator-card" style="border-top: 3px solid ${getCategoryColor(c.category)}">
+            <div class="creator-card-header">
+                <div class="creator-avatar">${getInitials(c.name)}</div>
+                <div class="creator-info">
+                    <div class="creator-name">${c.name}</div>
+                    <a href="https://instagram.com/${c.igHandle?.replace('@', '')}" target="_blank" class="creator-handle">${c.igHandle}</a>
                 </div>
-                ${c.notes ? `<p style="font-size: 12px; color: var(--sage); margin-top: 8px;">${c.notes}</p>` : ''}
+                <div class="creator-category">${getCategoryLabel(c.category)}</div>
             </div>
+            <div class="creator-stats">
+                <div class="creator-stat">
+                    <span class="stat-label">Avg Engagement</span>
+                    <span class="stat-value">${formatNumber(c.avgEngagement)}</span>
+                </div>
+                <div class="creator-stat">
+                    <span class="stat-label">Top Post</span>
+                    <span class="stat-value">${c.topPost || '--'}</span>
+                </div>
+            </div>
+            <div class="creator-notes">${c.notes || ''}</div>
         </div>
     `).join('');
 }
@@ -626,281 +574,199 @@ function renderOutliers() {
     const container = document.getElementById('outlierGrid');
     if (!container) return;
     
-    if (state.outliers.length === 0) {
+    if (!state.outliers || state.outliers.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <h3>No outliers detected</h3>
-                <p>Add creators to your watchlist and connect YouTube API to start detecting outliers.</p>
+                <p>Run weekly scrapes to detect high-performing content.</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = state.outliers.map(o => {
-        // Handle both YouTube (snippet/statistics) and Instagram (caption/engagement) formats
-        const isInstagram = o.platform === 'instagram';
-        const title = isInstagram ? (o.caption || 'Instagram post') : (o.snippet?.title || 'Unknown');
-        const metric = isInstagram ? o.engagement : (o.statistics?.viewCount || 0);
-        const metricLabel = isInstagram ? 'engagement' : 'views';
-        const avgMetric = isInstagram ? o.avgEngagement : o.avgViews;
-        const url = isInstagram ? o.postUrl : `https://youtube.com/watch?v=${o.id}`;
-        const platformIcon = isInstagram ? '📸' : '🎬';
-        const date = o.detectedAt || (o.snippet?.publishedAt ? formatDate(o.snippet.publishedAt) : '--');
-        const type = o.type || 'Content';
-        
-        return `
-            <div class="outlier-card">
-                <div class="outlier-header">
-                    <span class="outlier-creator">${platformIcon} ${o.creatorName || o.creatorHandle}</span>
-                    <span class="outlier-multiplier">${o.multiple || o.multiplier}x avg</span>
-                </div>
-                <a href="${url}" target="_blank" class="outlier-title">${title}</a>
-                <div class="outlier-type">${type}</div>
-                <div class="outlier-meta">
-                    <span>📊 ${formatNumber(metric)} ${metricLabel}</span>
-                    <span>👤 Avg: ${formatNumber(avgMetric)}</span>
-                    <span>📅 ${date}</span>
-                </div>
+    container.innerHTML = state.outliers.map(o => `
+        <div class="outlier-card">
+            <div class="outlier-header">
+                <span class="outlier-creator">📸 ${o.creatorName}</span>
+                <span class="outlier-multiple">${o.multiple}x avg</span>
             </div>
-        `;
-    }).join('');
-}
-
-// ============================================
-// Actions
-// ============================================
-
-async function saveYouTubeConfig() {
-    const apiKey = document.getElementById('ytApiKey').value.trim();
-    const channelId = document.getElementById('ytChannelId').value.trim();
-    
-    if (!apiKey || !channelId) {
-        alert('Please enter both API Key and Channel ID');
-        return;
-    }
-    
-    state.config.ytApiKey = apiKey;
-    state.config.ytChannelId = channelId;
-    saveState();
-    
-    // Test connection
-    const channel = await fetchYouTubeChannel(channelId);
-    if (channel) {
-        state.youtube.channel = channel;
-        
-        // Also fetch channel details for uploads playlist
-        const detailUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet,contentDetails&id=${channelId}&key=${apiKey}`;
-        const res = await fetch(detailUrl);
-        const data = await res.json();
-        if (data.items?.[0]) {
-            state.youtube.channel = data.items[0];
-        }
-        
-        // Fetch videos
-        state.youtube.videos = await fetchYouTubeVideos(channelId, 20);
-        state.youtube.lastFetch = new Date().toISOString();
-        saveState();
-        
-        renderYouTubeDashboard();
-        renderOverview();
-        updateLastUpdated();
-    } else {
-        alert('Could not connect to YouTube. Please check your API key and Channel ID.');
-    }
-}
-
-function saveIgSnapshot() {
-    const date = document.getElementById('igDate').value;
-    const followers = parseInt(document.getElementById('igInputFollowers').value) || 0;
-    const following = parseInt(document.getElementById('igInputFollowing').value) || 0;
-    const posts = parseInt(document.getElementById('igInputPosts').value) || 0;
-    const avgLikes = parseInt(document.getElementById('igInputLikes').value) || 0;
-    
-    if (!date || !followers) {
-        alert('Please enter at least date and followers');
-        return;
-    }
-    
-    state.instagram.snapshots.push({
-        date,
-        followers,
-        following,
-        posts,
-        avgLikes,
-    });
-    
-    saveState();
-    closeModal();
-    renderInstagram();
-    renderOverview();
-}
-
-function saveCreator() {
-    const name = document.getElementById('creatorName').value.trim();
-    const category = document.getElementById('creatorCategory').value;
-    const ytChannelId = document.getElementById('creatorYtChannel').value.trim();
-    const igHandle = document.getElementById('creatorIgHandle').value.trim();
-    const notes = document.getElementById('creatorNotes').value.trim();
-    
-    if (!name) {
-        alert('Please enter a creator name');
-        return;
-    }
-    
-    state.creators.push({
-        id: Date.now().toString(),
-        name,
-        category,
-        ytChannelId,
-        igHandle,
-        notes,
-    });
-    
-    saveState();
-    closeModal();
-    renderCreators();
-    renderCreatorSummary();
-}
-
-async function refreshAll() {
-    if (state.config.ytApiKey && state.config.ytChannelId) {
-        // Refresh your channel
-        const detailUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet,contentDetails&id=${state.config.ytChannelId}&key=${state.config.ytApiKey}`;
-        const res = await fetch(detailUrl);
-        const data = await res.json();
-        if (data.items?.[0]) {
-            state.youtube.channel = data.items[0];
-        }
-        
-        state.youtube.videos = await fetchYouTubeVideos(state.config.ytChannelId, 20);
-        state.youtube.lastFetch = new Date().toISOString();
-        
-        // Detect outliers from tracked creators
-        await detectAllOutliers();
-        
-        saveState();
-        renderAll();
-        updateLastUpdated();
-    }
-}
-
-function refreshTrends() {
-    // In a real implementation, this would fetch trending data
-    // For now, we'll keep the static trends
-    alert('Trend data is currently static. In a future version, this will fetch live trending topics.');
-}
-
-// ============================================
-// Modal Handling
-// ============================================
-
-function openIgMetricsModal() {
-    document.getElementById('modalOverlay').classList.add('active');
-    document.getElementById('igMetricsModal').classList.add('active');
-    document.getElementById('igDate').value = new Date().toISOString().split('T')[0];
-}
-
-function openAddCreatorModal() {
-    document.getElementById('modalOverlay').classList.add('active');
-    document.getElementById('addCreatorModal').classList.add('active');
-    
-    // Clear form
-    document.getElementById('creatorName').value = '';
-    document.getElementById('creatorYtChannel').value = '';
-    document.getElementById('creatorIgHandle').value = '';
-    document.getElementById('creatorNotes').value = '';
-}
-
-function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('active');
-    document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-}
-
-// ============================================
-// Utilities
-// ============================================
-
-function formatNumber(num) {
-    if (!num) return '--';
-    const n = parseInt(num);
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-    return n.toLocaleString();
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return '--';
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-    });
-}
-
-function formatCategory(cat) {
-    const labels = {
-        model: 'Model',
-        competitor: 'Competitor',
-        collab: 'Collab',
-    };
-    return labels[cat] || cat;
-}
-
-function getInitials(name) {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function updateLastUpdated() {
-    const el = document.getElementById('lastUpdated');
-    if (el) {
-        el.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
-    }
-}
-
-// ============================================
-// Render All
-// ============================================
-
-function renderAll() {
-    renderOverview();
-    renderYouTubeDashboard();
-    renderInstagram();
-    renderCreators();
-    renderOutliers();
-    renderTrends();
+            <a href="${o.postUrl}" target="_blank" class="outlier-caption">"${o.caption}"</a>
+            <div class="outlier-type">${o.type}</div>
+            <div class="outlier-stats">
+                <span>📊 ${formatNumber(o.engagement)} engagement</span>
+                <span>👤 Avg: ${formatNumber(o.avgEngagement)}</span>
+                <span>📅 ${o.detectedAt}</span>
+            </div>
+            <div class="outlier-insight">💡 ${o.insight}</div>
+        </div>
+    `).join('');
 }
 
 function renderTrends() {
-    // Render hot trends from state
-    const hotContainer = document.getElementById('hotTrends');
-    const topTrendsContainer = document.getElementById('topTrends');
+    const container = document.getElementById('trendsList');
+    if (!container) return;
     
-    if (state.trends && state.trends.length > 0) {
-        const hotTrends = state.trends.filter(t => t.heat === 'hot');
+    if (!state.trends || state.trends.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No trends tracked</p></div>';
+        return;
+    }
+    
+    container.innerHTML = state.trends.map(t => `
+        <div class="trend-card ${t.heat}">
+            <div class="trend-header">
+                <span class="trend-heat-badge">${t.heat === 'hot' ? '🔥 HOT' : '📈 RISING'}</span>
+            </div>
+            <div class="trend-topic">${t.topic}</div>
+            <div class="trend-examples"><strong>Examples:</strong> ${t.examples}</div>
+            <div class="trend-action"><strong>Action:</strong> ${t.action}</div>
+        </div>
+    `).join('');
+    
+    // Also update the sidebar/overview version
+    const hotTrends = document.getElementById('hotTrends');
+    if (hotTrends) {
+        hotTrends.innerHTML = state.trends.filter(t => t.heat === 'hot').map(t => 
+            `<span class="trend-tag hot">${t.topic}</span>`
+        ).join('');
+    }
+}
+
+function renderContentIdeas() {
+    const container = document.getElementById('contentIdeasList');
+    if (!container) return;
+    
+    if (!state.contentIdeas || state.contentIdeas.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No content ideas yet</p></div>';
+        return;
+    }
+    
+    container.innerHTML = state.contentIdeas.map((idea, i) => `
+        <div class="idea-card">
+            <div class="idea-number">#${i + 1}</div>
+            <div class="idea-content">
+                <div class="idea-hook">"${idea.hook}"</div>
+                <div class="idea-angle">${idea.angle}</div>
+                <div class="idea-based-on">Based on: ${idea.basedOn}</div>
+            </div>
+            <div class="idea-status ${idea.status}">${idea.status === 'ready' ? '✅ Ready to film' : '📝 Draft'}</div>
+        </div>
+    `).join('');
+}
+
+// ============================================
+// TAB NAVIGATION
+// ============================================
+
+function initTabs() {
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.dataset.tab;
+            switchTab(tabId);
+        });
+    });
+}
+
+function switchTab(tabId) {
+    // Update tab buttons
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const activeTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (activeTab) activeTab.classList.add('active');
+    
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const activeContent = document.getElementById(tabId);
+    if (activeContent) activeContent.classList.add('active');
+}
+
+// ============================================
+// ACTIONS
+// ============================================
+
+function refreshAll() {
+    showToast('Refreshing data...');
+    renderAll();
+    showToast('Data refreshed!');
+}
+
+async function saveYouTubeConfig() {
+    const apiKey = document.getElementById('ytApiKey')?.value?.trim();
+    const channelId = document.getElementById('ytChannelId')?.value?.trim();
+    
+    if (apiKey && !apiKey.includes('•')) {
+        state.config.ytApiKey = apiKey;
+    }
+    if (channelId) {
+        state.config.ytChannelId = channelId;
+    }
+    
+    saveState();
+    showToast('YouTube config saved!');
+    
+    // Try to fetch live data if API key provided
+    if (state.config.ytApiKey && state.config.ytChannelId) {
+        await fetchYouTubeData();
+    }
+}
+
+async function fetchYouTubeData() {
+    if (!state.config.ytApiKey || !state.config.ytChannelId) return;
+    
+    showToast('Fetching YouTube data...');
+    
+    try {
+        const response = await fetch(
+            `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${state.config.ytChannelId}&key=${state.config.ytApiKey}`
+        );
+        const data = await response.json();
         
-        if (hotContainer) {
-            hotContainer.innerHTML = state.trends.map(t => `
-                <span class="trend-tag ${t.heat === 'hot' ? 'hot' : ''}">${t.topic}</span>
-            `).join('');
+        if (data.items && data.items[0]) {
+            state.youtube.channel = data.items[0];
+            state.youtube.lastFetch = new Date().toISOString();
+            saveState();
+            renderAll();
+            showToast('YouTube data updated!');
         }
-        
-        if (topTrendsContainer) {
-            topTrendsContainer.innerHTML = `
-                <div class="trend-list-items">
-                    ${state.trends.slice(0, 4).map(t => `
-                        <div class="trend-item">
-                            <span class="trend-heat ${t.heat}">${t.heat === 'hot' ? '🔥' : '📈'}</span>
-                            <span class="trend-topic">${t.topic}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
+    } catch (e) {
+        console.error('YouTube fetch error:', e);
+        showToast('Error fetching YouTube data');
+    }
+}
+
+function addInstagramSnapshot() {
+    const followers = prompt('Enter current followers:');
+    const avgLikes = prompt('Enter average likes per post:');
+    
+    if (followers && avgLikes) {
+        state.instagram.snapshots.push({
+            date: new Date().toISOString().split('T')[0],
+            followers: parseInt(followers),
+            following: state.instagram.profile.following,
+            posts: state.instagram.profile.posts,
+            avgLikes: parseInt(avgLikes),
+            avgComments: 0,
+            notes: 'Manual entry'
+        });
+        saveState();
+        renderInstagram();
+        showToast('Snapshot added!');
     }
 }
 
 // ============================================
-// Initialize
+// MODAL HANDLING
+// ============================================
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId || 'modalOverlay');
+    if (modal) modal.classList.add('active');
+}
+
+function closeModal() {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+}
+
+// ============================================
+// INITIALIZE
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -908,17 +774,20 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     renderAll();
     
-    // Close modal on overlay click
-    document.getElementById('modalOverlay').addEventListener('click', (e) => {
-        if (e.target.id === 'modalOverlay') {
-            closeModal();
-        }
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
     });
     
     // Close modal on Escape
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
+        if (e.key === 'Escape') closeModal();
     });
+    
+    console.log('📊 LFG Content Intelligence Dashboard loaded!');
+    console.log('Data version:', state.version);
 });
