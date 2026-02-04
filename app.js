@@ -19,23 +19,21 @@ const state = {
         lastFetch: null,
     },
     instagram: {
-        snapshots: [],
+        snapshots: [
+            {
+                date: '2026-02-04',
+                followers: 20856,
+                following: 3257,
+                posts: 119,
+                avgLikes: 182,
+                avgComments: 24,
+                notes: 'Initial scrape via Apify. 0 Reels, 11 Images, 9 Carousels.'
+            }
+        ],
         profile: {
             handle: 'thedanharrison',
             name: 'Dan Harrison • Business Coach',
-            followers: 20856,
-            following: 3257,
-            posts: 119,
             bio: 'Installing AI into my business & documenting everything | 3x Skool Games 🏆'
-        },
-        analytics: {
-            lastUpdated: '2026-02-04',
-            avgLikes: 182,
-            avgComments: 24,
-            avgEngagement: 206,
-            reels: 0,
-            images: 11,
-            carousels: 9
         },
         topPosts: [
             { caption: '#godisgood (wedding)', engagement: 1191, type: 'Carousel', multiple: 5.8 },
@@ -60,6 +58,20 @@ function loadState() {
     // Initialize with default creators if empty
     if (state.creators.length === 0) {
         state.creators = getDefaultCreators();
+        saveState();
+    }
+    
+    // Initialize Instagram data if empty
+    if (!state.instagram.snapshots || state.instagram.snapshots.length === 0) {
+        state.instagram.snapshots = [{
+            date: '2026-02-04',
+            followers: 20856,
+            following: 3257,
+            posts: 119,
+            avgLikes: 182,
+            avgComments: 24,
+            notes: 'Initial scrape via Apify'
+        }];
         saveState();
     }
 }
